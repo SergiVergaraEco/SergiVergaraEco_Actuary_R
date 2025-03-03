@@ -18,7 +18,7 @@ El objetivo de este repositorio es proporcionar una **herramienta actuarial en R
 - **Método de Newton-Raphson multidimensional**
 - **Análisis de VaR actuarial**
 
-La idea del trabajo es obtener una prima de riesgo de equilibro mediante el uso de metodos numericos.
+La idea del trabajo es obtener una prima de riesgo de equilibro mediante el uso de métodos numéricos.
   
 Este trabajo forma parte de mi formación en el **Máster en Ciencias Actuariales y Financieras (UB)** y es resultado de la aplicación de conocimientos en cálculo numérico, estadística actuarial y modelización financiera.  
 
