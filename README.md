@@ -1,8 +1,8 @@
-# 📊 SergiVergaraEco_Actuary_R
+# SergiVergaraEco_Actuary_R
 
 Este repositorio contiene código y herramientas actuariales desarrolladas en **R Studio** para la modelización del **riesgo de longevidad en hipotecas inversas** mediante **métodos numéricos**.  
 
-## 📌 Contenido del repositorio
+# Contenido del repositorio
 - 📂 `Calculadora_hipoteca_Inversa_Máxima/`
   - 📝 `Codigo_general.txt` → Código principal del modelo actuarial.
   - 🛠️ `Funciones_entorno.txt` → Funciones auxiliares usadas en los cálculos.
@@ -11,7 +11,7 @@ Este repositorio contiene código y herramientas actuariales desarrolladas en **
   - 📑 `TABLA_VIDA.xlsx` → Datos de tablas de mortalidad utilizadas en el cálculo.
   - 🏡 `VIVIENDA.xlsx` → Datos de mercado inmobiliario para el análisis.
 
-## 🚀 Objetivo del Proyecto
+#Objetivo del Proyecto
 El objetivo de este repositorio es proporcionar una **herramienta actuarial en R** para evaluar la **prima de riesgo y anualidad máxima** en hipotecas inversas, considerando el **riesgo de longevidad** mediante técnicas como:
 - **Interpolación lineal**
 - **Modelos de capitalización y revalorización**
@@ -22,7 +22,7 @@ La idea del trabajo es obtener una prima de riesgo de equilibro mediante el uso 
   
 Este trabajo forma parte de mi formación en el **Máster en Ciencias Actuariales y Financieras (UB)** y es resultado de la aplicación de conocimientos en cálculo numérico, estadística actuarial y modelización financiera.  
 
-## 🔧 Instalación y Uso
+# Instalación y Uso
 1. Descarga la carpeta, si solo estas interesado en la calculadora bastaría el script en R.
 2. Ejecuta el script desde "source", el script esta montado para generar el entorno directamente. Aun así he dejado el entorno en archivos por lo que puedes cargarlo manualente si lo prefieres
 3. Introduce los datos
