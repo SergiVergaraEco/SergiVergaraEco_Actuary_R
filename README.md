@@ -3,13 +3,13 @@
 Este repositorio contiene código y herramientas actuariales desarrolladas en **R Studio** para la modelización del **riesgo de longevidad en hipotecas inversas** mediante **métodos numéricos**.  
 
 # Contenido del repositorio
-- 📂 `Calculadora_hipoteca_Inversa_Máxima/`
-  - 📝 `Codigo_general.txt` → Código principal del modelo actuarial.
-  - 🛠️ `Funciones_entorno.txt` → Funciones auxiliares usadas en los cálculos.
-  - 📊 `Riesgo_de_longevidad_Hipotecas_Inversas.R` → Script en R para la simulación del modelo.
-  - 📖 `Riesgo_Longevidad_Hipotecas_Inversas.pdf` → Documento con la teoría detrás del modelo.
-  - 📑 `TABLA_VIDA.xlsx` → Datos de tablas de mortalidad utilizadas en el cálculo.
-  - 🏡 `VIVIENDA.xlsx` → Datos de mercado inmobiliario para el análisis.
+-  `Calculadora_hipoteca_Inversa_Máxima/`
+  -  `Codigo_general.txt` → Código principal del modelo actuarial.
+  -  `Funciones_entorno.txt` → Funciones auxiliares usadas en los cálculos.
+  -  `Riesgo_de_longevidad_Hipotecas_Inversas.R` → Script en R para la simulación del modelo.
+  -  `Riesgo_Longevidad_Hipotecas_Inversas.pdf` → Documento con la teoría detrás del modelo.
+  -  `TABLA_VIDA.xlsx` → Datos de tablas de mortalidad utilizadas en el cálculo.
+  -  `VIVIENDA.xlsx` → Datos de mercado inmobiliario para el análisis.
 
 #Objetivo del Proyecto
 El objetivo de este repositorio es proporcionar una **herramienta actuarial en R** para evaluar la **prima de riesgo y anualidad máxima** en hipotecas inversas, considerando el **riesgo de longevidad** mediante técnicas como:
