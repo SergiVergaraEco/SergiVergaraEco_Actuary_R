@@ -11,7 +11,7 @@ Este repositorio contiene código y herramientas actuariales desarrolladas en **
   -  `TABLA_VIDA.xlsx` → Datos de tablas de mortalidad utilizadas en el cálculo.
   -  `VIVIENDA.xlsx` → Datos de mercado inmobiliario para el análisis.
 
-#Objetivo del Proyecto
+# Objetivo del Proyecto
 El objetivo de este repositorio es proporcionar una **herramienta actuarial en R** para evaluar la **prima de riesgo y anualidad máxima** en hipotecas inversas, considerando el **riesgo de longevidad** mediante técnicas como:
 - **Interpolación lineal**
 - **Modelos de capitalización y revalorización**
