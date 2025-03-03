@@ -1,0 +1,331 @@
+P <- function(C0, g, t, r) {
+  q <- (C0 * (1 + g)^t * r) / ((1 + r) * ((1 + r)^t - 1))
+  return(q)
+}
+
+D <- function(t, r, P) {
+  q <- P * ((1 + r) / r) * ((1 + r)^t - 1)
+  return(q)
+}
+integrar_D <- function(lower, upper, r, P) {
+  integral <- integrate(function(x) D(x, r, P), lower = lower, upper = upper)
+  return(integral$value)
+}
+
+
+C <- function(t, g, C0) {
+  q <- C0 * (1 + g)^t
+  return(q)
+}
+integrar_C <- function(lower, upper, g, C0) {
+  integral <- integrate(function(x) C(x, g, C0), lower = lower, upper = upper)
+  return(integral$value)
+}
+
+calcular_pago_mensual <- function(P, r) {
+  r_m <- (1 + r)^(1/12) - 1
+  suma_factores <- sum((1 + r_m)^(12 - 1:12))
+  m <- P*(1 + r) / suma_factores
+  return(round(m, 2))
+}
+P <- function(C0, g, t, r) {
+  q <- (C0 * (1 + g)^t * r) / ((1 + r) * ((1 + r)^t - 1))
+  return(q)
+}
+
+G <- function(t, r_0, r_k, P_T) {
+  q <- integrar_D(t, t+1, r_k, P_T) - integrar_D(t, t+1, r_0, P_T)
+  return(q)
+}
+
+L <- function(t, g, C0, r_0, P_T) {
+  q <- integrar_C(t, t+1, g, C0) - integrar_D(t, t+1, r_0, P_T)
+  return(q)
+}
+vector_val_H <- function(t_contr, g, C0, r_0, r_k, P_T) {
+  resultados <- c()
+  if (t_contr >= 1) {
+    for (t in 0:(floor(t_contr) - 1)) {
+      G_t <- G(t, r_0, r_k, P_T)
+      resultados <- c(resultados, G_t)
+    }
+  }
+  if (length(resultados) >= (w - x + 1)) {
+    return(resultados) 
+    
+  }
+  G_contrib = integrar_D(floor(t_contr), t_contr, r_k, P_T) - integrar_D(floor(t_contr), t_contr, r_0, P_T)
+  L_contrib = integrar_C(t_contr, floor(t_contr)+1, g, C0) - integrar_D(t_contr, floor(t_contr)+1, r_0, P_T)
+  salto <- G_contrib + L_contrib
+  resultados <- c(resultados, salto) 
+  
+  if (length(resultados) >= (w - x + 1)) {
+    return(resultados) 
+  }
+  if (floor(t_contr) + 1 <= w - x) {
+    for (t in (floor(t_contr) + 1):(w - x)) {
+      L_t <- L(t, g, C0, r_0, P_T)
+      resultados <- c(resultados, L_t)
+    }
+  }
+  return(resultados)
+}
+vector_prob_H <- function(TABLA_VIDA, x, w) {
+  # Inicializar el vector de resultados
+  vector_probabilidades <- c()
+  
+  # Bucle para calcular probabilidades de muerte diferida
+  for (t in 0:(w - x)) {
+    if (t == 0) {
+      # Probabilidad de morir en el primer año (qx de la edad actual)
+      prob_muerte_t <- TABLA_VIDA$qx[TABLA_VIDA$age == x]
+    } else {
+      # Probabilidad de sobrevivir t años y morir en el año t+1
+      px_t <- prod(TABLA_VIDA$px[TABLA_VIDA$age >= x & TABLA_VIDA$age < (x + t)])
+      qx_t <- TABLA_VIDA$qx[TABLA_VIDA$age == (x + t)]
+      prob_muerte_t <- px_t * qx_t
+    }
+    
+    # Agregar la probabilidad calculada al vector
+    vector_probabilidades <- c(vector_probabilidades, prob_muerte_t)
+  }
+  
+  return(vector_probabilidades)
+}
+
+H <- function(TABLA_VIDA, x, w, t_contr, g, C0, r_0, r_k, P_T) {
+  
+  VAL_H <- vector_val_H(t_contr, g, C0, r_0, r_k, P_T)
+  
+  PROB_H <- vector_prob_H(TABLA_VIDA, x, w)
+  
+  resultado <- sum(VAL_H * PROB_H)
+  
+  return(resultado)
+}
+
+
+generar_plots <- function(tabla) {
+  # Filtrar la tabla para incluir solo las filas con "Éxito"
+  tabla_exito <- subset(tabla, Estimación == "Éxito")
+  tabla_referencias <- subset(tabla_exito, !is.na(Referencias))
+  tabla_sin_referencias <- subset(tabla_exito, is.na(Referencias))
+  colores <- rainbow(length(unique(tabla_referencias$Referencias)))
+  nombres_referencias <- unique(tabla_referencias$Referencias)
+  colores_asignados <- setNames(colores, nombres_referencias)
+  par(mfrow = c(1, 2)) 
+  ### Plot 
+  plot(
+    tabla_exito$Mensualidad, tabla_exito$r_k,
+    xlab = "Mensualidad",
+    ylab = "r_k",
+    main = "r_k vs Mensualidad",
+    type = "n" 
+  )
+  # Graficar los puntos sin referencias 
+  if (nrow(tabla_sin_referencias) > 0) {
+    lines(
+      tabla_sin_referencias$Mensualidad, tabla_sin_referencias$r_k,
+      type = "b", col = "black", lty = 1, pch = 16
+    )
+  }
+  # Graficar los puntos con referencias 
+  if (nrow(tabla_referencias) > 0) {
+    for (i in seq_along(tabla_referencias$Mensualidad)) {
+      points(
+        tabla_referencias$Mensualidad[i], tabla_referencias$r_k[i],
+        col = colores_asignados[tabla_referencias$Referencias[i]],
+        pch = 16
+      )
+    }
+  }
+  # Añadir la leyenda 
+  if (nrow(tabla_referencias) > 0) {
+    legend(
+      "topleft", legend = nombres_referencias, 
+      col = colores, pch = 16, cex = 0.8, title = "Referencias"
+    )
+  }
+  grid()
+  ### Plot 
+  plot(
+    tabla_exito$T_risk, tabla_exito$r_k,
+    xlab = "T_risk",
+    ylab = "r_k",
+    main = "r_k vs T_risk",
+    type = "n" 
+  )
+  # Graficar los puntos sin referencias 
+  if (nrow(tabla_sin_referencias) > 0) {
+    lines(
+      tabla_sin_referencias$T_risk, tabla_sin_referencias$r_k,
+      type = "b", col = "black", lty = 1, pch = 16
+    )
+  }
+  # Graficar los puntos con referencias 
+  if (nrow(tabla_referencias) > 0) {
+    for (i in seq_along(tabla_referencias$T_risk)) {
+      points(
+        tabla_referencias$T_risk[i], tabla_referencias$r_k[i],
+        col = colores_asignados[tabla_referencias$Referencias[i]],
+        pch = 16
+      )
+    }
+  }
+  # Añadir la leyenda
+  if (nrow(tabla_referencias) > 0) {
+    legend(
+      "topright", legend = nombres_referencias, 
+      col = colores, pch = 16, cex = 0.8, title = "Referencias"
+    )
+  }
+  grid()
+  par(mfrow = c(1, 1))
+}
+
+
+generar_plots_rk_menor_0_1 <- function(tabla) {
+  tabla_exito <- subset(tabla, Estimación == "Éxito" & r_k < 0.1)
+  tabla_referencias <- subset(tabla_exito, !is.na(Referencias))
+  tabla_sin_referencias <- subset(tabla_exito, is.na(Referencias))
+  colores <- rainbow(length(unique(tabla_referencias$Referencias)))
+  nombres_referencias <- unique(tabla_referencias$Referencias)
+  colores_asignados <- setNames(colores, nombres_referencias)
+  par(mfrow = c(1, 2)) 
+  plot(
+    tabla_exito$Mensualidad, tabla_exito$r_k,
+    xlab = "Mensualidad",
+    ylab = "r_k",
+    main = "r_k vs Mensualidad (r_k < 0.1)",
+    type = "n" 
+  )
+  
+  # Graficar los puntos sin referencias 
+  if (nrow(tabla_sin_referencias) > 0) {
+    lines(
+      tabla_sin_referencias$Mensualidad, tabla_sin_referencias$r_k,
+      type = "b", col = "black", lty = 1, pch = 16
+    )
+  }
+  
+  # Graficar los puntos con referencias 
+  if (nrow(tabla_referencias) > 0) {
+    for (i in seq_along(tabla_referencias$Mensualidad)) {
+      points(
+        tabla_referencias$Mensualidad[i], tabla_referencias$r_k[i],
+        col = colores_asignados[tabla_referencias$Referencias[i]],
+        pch = 16
+      )
+    }
+  }
+  # Añadir la leyenda
+  if (nrow(tabla_referencias) > 0) {
+    legend(
+      "topleft", legend = nombres_referencias, 
+      col = colores, pch = 16, cex = 0.8, title = "Referencias"
+    )
+  }
+  grid()
+  ### Plot
+  plot(
+    tabla_exito$T_risk, tabla_exito$r_k,
+    xlab = "T_risk",
+    ylab = "r_k",
+    main = "r_k vs T_risk (r_k < 0.1)",
+    type = "n" 
+  )
+  # Graficar los puntos sin referencias 
+  if (nrow(tabla_sin_referencias) > 0) {
+    lines(
+      tabla_sin_referencias$T_risk, tabla_sin_referencias$r_k,
+      type = "b", col = "black", lty = 1, pch = 16
+    )
+  }
+  
+  # Graficar los puntos con referencias 
+  if (nrow(tabla_referencias) > 0) {
+    for (i in seq_along(tabla_referencias$T_risk)) {
+      points(
+        tabla_referencias$T_risk[i], tabla_referencias$r_k[i],
+        col = colores_asignados[tabla_referencias$Referencias[i]],
+        pch = 16
+      )
+    }
+  }
+  # Añadir la leyenda 
+  if (nrow(tabla_referencias) > 0) {
+    legend(
+      "topright", legend = nombres_referencias, 
+      col = colores, pch = 16, cex = 0.8, title = "Referencias"
+    )
+  }
+  grid()
+  par(mfrow = c(1, 1))
+}
+
+
+newtonraphson_rktcontr <- function(x, w, g, C0, r_0, P_T, t_risk, 
+                                   t_contr_inicial, r_k_inicial, 
+                                   error_tolerancia = 1e-6, max_iter = 100) {
+  iter <- 1
+  error <- Inf
+  variables <- c(t_contr = t_contr_inicial, r_k = r_k_inicial)  # Valores iniciales
+  
+  # El sistema de ecuaciones
+  f <- function(vars) {
+    t_contr <- vars["t_contr"]
+    r_k <- vars["r_k"]
+    c(
+      D(t_contr, r_k, P_T) - C(t_contr, g, C0), # Condición de máxima anualidad
+      H(TABLA_VIDA, x, w, t_contr, g, C0, r_0, r_k, P_T) # Condición de riesgo
+    )
+  }
+  # Aproximar la jacobiana numéricamente
+  jacobiana <- function(vars) {
+    t_contr <- vars["t_contr"]
+    r_k <- vars["r_k"]
+    h <- 1e-8  # Aproximar desde la definición
+    J <- matrix(0, nrow = 2, ncol = 2)
+    # Derivadas parciales respecto a t_contr
+    vars_t_contr <- vars
+    vars_t_contr["t_contr"] <- t_contr + h
+    J[, 1] <- (f(vars_t_contr) - f(vars)) / h
+    # Derivadas parciales respecto a r_k
+    vars_r_k <- vars
+    vars_r_k["r_k"] <- r_k + h
+    J[, 2] <- (f(vars_r_k) - f(vars)) / h
+    return(J)
+  }
+  # Manejo de errores durante la iteración
+  tryCatch(
+    {
+      while (error > error_tolerancia && iter <= max_iter) {
+        # Evaluar las funciones y la jacobiana
+        F <- f(variables)
+        J <- jacobiana(variables)
+        
+        # Actualización de Newton-Raphson: 
+        delta <- solve(J, -F)  # Resolver sistema lineal
+        variables <- variables + delta
+        
+        # Restringir t_contr y r_k a los límites
+        variables["t_contr"] <- max(1e-4, min(variables["t_contr"], t_risk)) # 1e-4 es virtualmente 0 y evita que el método explore valores negativos de t_contr, que por teoría sabemos que es una zona de divergencia garantizada
+        variables["r_k"] <- max(r_0, variables["r_k"]) # r_k >= r_0 por definición
+        
+        # Calcular el error como la norma de F
+        error <- sqrt(sum(F^2))
+        iter <- iter + 1
+      }
+    },
+    error = function(e) {
+      cat("Error en la iteración de Newton-Raphson:", conditionMessage(e), "\n")
+      return(list(t_contr = NA, r_k = NA, error = Inf))
+    }
+  )
+  
+  if (iter > max_iter) {
+    cat("No se alcanzó la convergencia después de", max_iter, "iteraciones.\n")
+  }
+  
+  return(list(t_contr = variables["t_contr"], r_k = variables["r_k"], error = error))
+}
