@@ -29,6 +29,8 @@ Este trabajo forma parte de mi formación en el **Máster en Ciencias Actuariale
 4. Obten soluciones de mi modelo
 
 
+# Recomenaciones, contacto, licencia,...
+
 Podría ser interesante de cara a una aplicación mas precisa modificar el codigo cargando tablas de mortalidad segregada.
 
 
